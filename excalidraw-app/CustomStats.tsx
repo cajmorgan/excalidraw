@@ -14,10 +14,10 @@ type StorageSizes = { scene: number; total: number };
 
 const STORAGE_SIZE_TIMEOUT = 500;
 
-const getStorageSizes = debounce((cb: (sizes: StorageSizes) => void) => {
+const getStorageSizes = debounce(async (cb: (sizes: StorageSizes) => void) => {
   cb({
-    scene: getElementsStorageSize(),
-    total: getTotalStorageSize(),
+    scene: await getElementsStorageSize(),
+    total: await getTotalStorageSize(),
   });
 }, STORAGE_SIZE_TIMEOUT);
 
@@ -74,7 +74,7 @@ const CustomStats = (props: Props) => {
             try {
               await copyTextToSystemClipboard(getVersion());
               props.setToast(t("toast.copyToClipboard"));
-            } catch {}
+            } catch { }
           }}
           title={t("stats.versionCopy")}
         >

@@ -7,6 +7,7 @@ import {
 import { clearElementsForLocalStorage } from "../../src/element";
 import { STORAGE_KEYS } from "../app_constants";
 import { ImportedDataState } from "../../src/data/types";
+import * as idb from "idb-keyval";
 
 export const saveUsernameToLocalStorage = (username: string) => {
   try {
@@ -34,12 +35,13 @@ export const importUsernameFromLocalStorage = (): string | null => {
   return null;
 };
 
-export const importFromLocalStorage = () => {
+export const importFromLocalStorage = async () => {
   let savedElements = null;
   let savedState = null;
 
   try {
-    savedElements = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS);
+    savedElements = await idb.get(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS)
+    //savedElements = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS);
     savedState = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE);
   } catch (error: any) {
     // Unable to access localStorage
@@ -73,9 +75,9 @@ export const importFromLocalStorage = () => {
   return { elements, appState };
 };
 
-export const getElementsStorageSize = () => {
+export const getElementsStorageSize = async () => {
   try {
-    const elements = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS);
+    const elements = await idb.get(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS);
     const elementsSize = elements?.length || 0;
     return elementsSize;
   } catch (error: any) {
@@ -84,7 +86,7 @@ export const getElementsStorageSize = () => {
   }
 };
 
-export const getTotalStorageSize = () => {
+export const getTotalStorageSize = async () => {
   try {
     const appState = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE);
     const collab = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_COLLAB);
@@ -94,7 +96,7 @@ export const getTotalStorageSize = () => {
     const collabSize = collab?.length || 0;
     const librarySize = library?.length || 0;
 
-    return appStateSize + collabSize + librarySize + getElementsStorageSize();
+    return appStateSize + collabSize + librarySize + await getElementsStorageSize();
   } catch (error: any) {
     console.error(error);
     return 0;

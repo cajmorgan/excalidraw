@@ -20,6 +20,7 @@ import { SAVE_TO_LOCAL_STORAGE_TIMEOUT, STORAGE_KEYS } from "../app_constants";
 import { FileManager } from "./FileManager";
 import { Locker } from "./Locker";
 import { updateBrowserStateVersion } from "./tabSync";
+import * as idb from "idb-keyval";
 
 const filesStore = createStore("files-db", "files-store");
 
@@ -43,19 +44,23 @@ class LocalFileManager extends FileManager {
   };
 }
 
-const saveDataStateToLocalStorage = (
+const saveDataStateToLocalStorage = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
   try {
-    localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-      JSON.stringify(clearElementsForLocalStorage(elements)),
-    );
+    // localStorage.setItem(
+    //   STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
+    //   JSON.stringify(clearElementsForLocalStorage(elements)),
+    // );
+
+    await idb.set(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS, JSON.stringify(clearElementsForLocalStorage(elements)))
+
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
       JSON.stringify(clearAppStateForLocalStorage(appState)),
     );
+
     updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
   } catch (error: any) {
     // Unable to access window.localStorage

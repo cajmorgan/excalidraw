@@ -155,7 +155,7 @@ const initializeScene = async (opts: {
   );
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
-  const localDataState = importFromLocalStorage();
+  const localDataState = await importFromLocalStorage();
 
   let scene: RestoredDataState & {
     scrollToContent?: boolean;
@@ -261,11 +261,11 @@ const initializeScene = async (opts: {
   } else if (scene) {
     return isExternalScene && jsonBackendMatch
       ? {
-          scene,
-          isExternalScene,
-          id: jsonBackendMatch[1],
-          key: jsonBackendMatch[2],
-        }
+        scene,
+        isExternalScene,
+        id: jsonBackendMatch[1],
+        key: jsonBackendMatch[2],
+      }
       : { scene, isExternalScene: false };
   }
   return { scene: null, isExternalScene: false };
@@ -421,7 +421,7 @@ const ExcalidrawWrapper = () => {
       TITLE_TIMEOUT,
     );
 
-    const syncData = debounce(() => {
+    const syncData = debounce(async () => {
       if (isTestEnv()) {
         return;
       }
@@ -431,7 +431,7 @@ const ExcalidrawWrapper = () => {
       ) {
         // don't sync if local state is newer or identical to browser state
         if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)) {
-          const localDataState = importFromLocalStorage();
+          const localDataState = await importFromLocalStorage();
           const username = importUsernameFromLocalStorage();
           let langCode = languageDetector.detect() || defaultLang.code;
           if (Array.isArray(langCode)) {
@@ -543,8 +543,8 @@ const ExcalidrawWrapper = () => {
         STORAGE_KEYS.LOCAL_STORAGE_THEME,
       ) as Theme | null) ||
       // FIXME migration from old LS scheme. Can be removed later. #5660
-      importFromLocalStorage().appState?.theme ||
-      THEME.LIGHT,
+      //importFromLocalStorage().appState?.theme ||
+      THEME.DARK,
   );
 
   useEffect(() => {
